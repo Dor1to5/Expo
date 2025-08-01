@@ -1,0 +1,275 @@
+# PROMPT PARA SISTEMA DE GESTIÓN COMPLETO CON PHP OOP
+
+## CONTEXTO DEL PROYECTO
+Crear un sistema web completo de gestión con PHP orientado a objetos, implementando autenticación por roles, área pública y panel de administración.
+
+## DIRECTRICES OBLIGATORIAS
+
+### IDIOMA Y DOCUMENTACIÓN
+- **Idioma**: Español de España en todo el código, comentarios, variables y documentación
+- **Comentarios**: Documentar TODAS las clases, métodos y funciones complejas
+- **Variables/Métodos**: Nomenclatura en español con camelCase (ej: `nombreUsuario`, `crearExposicion()`)
+
+### ARQUITECTURA TÉCNICA
+- **Lenguaje**: PHP 8.0+ con paradigma Orientado a Objetos
+- **Patrón**: MVC (Modelo-Vista-Controlador)
+- **Base de Datos**: MySQL con PDO
+- **Seguridad**: Hash de contraseñas, sanitización de datos, protección CSRF
+- **Sesiones**: Gestión segura de sesiones PHP
+
+## ESTRUCTURA DE DIRECTORIOS REQUERIDA
+```
+/
+├── config/
+│   ├── basedatos.php          # Configuración BD
+│   ├── configuracion.php      # Configuración general
+│   └── rutas.php             # Sistema de enrutado
+├── src/
+│   ├── Controladores/        # Controladores MVC
+│   ├── Modelos/             # Modelos de datos
+│   ├── Servicios/           # Lógica de negocio
+│   └── Utilidades/          # Clases auxiliares
+├── publico/                 # Área pública
+│   ├── index.php           # Punto de entrada
+│   ├── css/
+│   ├── js/
+│   └── imagenes/
+├── vistas/
+│   ├── publicas/           # Templates área pública
+│   ├── admin/              # Templates área admin
+│   └── plantillas/         # Layouts base
+├── admin/                  # Panel administración
+└── arch/                   # Documentación proyecto
+```
+
+## SISTEMA DE ROLES Y AUTENTICACIÓN
+
+### Roles Requeridos
+1. **Invitado**: Acceso solo área pública
+2. **Usuario**: Acceso área pública + perfil personal
+3. **Editor**: Gestión contenido (blog, exposiciones)
+4. **Administrador**: Acceso completo al sistema
+
+### Clases Base de Autenticación
+```php
+// Modelo Usuario con roles
+class Usuario {
+    private int $id;
+    private string $nombreUsuario;
+    private string $email;
+    private string $contrasenaHash;
+    private Rol $rol;
+    private DateTime $fechaCreacion;
+    
+    // Métodos: autenticar(), tienePermiso(), etc.
+}
+
+// Sistema de roles
+class Rol {
+    private int $id;
+    private string $nombre;
+    private array $permisos;
+    
+    // Métodos: puedeAcceder(), listarPermisos(), etc.
+}
+```
+
+## ÁREA PÚBLICA - FUNCIONALIDADES
+
+### Páginas Requeridas
+- **Inicio**: Landing page con información general
+- **Acerca de**: Información de la organización
+- **Blog**: Lista de artículos públicos con paginación
+- **Exposiciones**: Catálogo público de exposiciones
+- **Contacto**: Formulario de contacto
+- **Login**: Formulario de inicio de sesión
+- **Registro**: Formulario de registro de usuarios
+
+### Controladores Públicos
+```php
+class InicioControlador {
+    // Mostrar página principal
+    public function mostrarInicio(): void
+}
+
+class BlogControlador {
+    // Listar artículos públicos
+    public function listarArticulos(int $pagina = 1): void
+    // Mostrar artículo individual
+    public function mostrarArticulo(int $id): void
+}
+
+class AutenticacionControlador {
+    // Procesar login
+    public function procesarLogin(): void
+    // Procesar registro
+    public function procesarRegistro(): void
+    // Cerrar sesión
+    public function cerrarSesion(): void
+}
+```
+
+## PANEL DE ADMINISTRACIÓN
+
+### Funcionalidades del Panel Admin
+- **Dashboard**: Estadísticas y resumen del sistema
+- **Gestión de Usuarios**: CRUD completo de usuarios
+- **Gestión de Roles**: CRUD completo de roles y permisos
+- **Gestión de Exposiciones**: CRUD completo de exposiciones
+- **Gestión de Blog**: CRUD completo de artículos
+- **Configuración**: Ajustes del sistema
+
+### Estructura por Cada Entidad
+Para CADA clase del sistema, crear:
+1. **Vista Lista**: Tabla con todos los registros + botón "Crear Nuevo"
+2. **Vista Detalles**: Formulario de edición con todos los campos
+3. **Funciones**: Crear, Editar, Eliminar, Ver
+4. **Validaciones**: Tanto front-end como back-end
+5. **Confirmaciones**: Para acciones destructivas (eliminar)
+
+### Ejemplo de Controlador Admin
+```php
+class AdminExposicionControlador extends ControladorBase {
+    /**
+     * Muestra lista paginada de exposiciones
+     */
+    public function listar(int $pagina = 1): void {
+        $this->verificarPermiso('exposiciones.listar');
+        // Lógica para mostrar lista
+    }
+    
+    /**
+     * Muestra formulario para crear exposición
+     */
+    public function mostrarCrear(): void {
+        $this->verificarPermiso('exposiciones.crear');
+        // Mostrar formulario vacío
+    }
+    
+    /**
+     * Procesa creación de exposición
+     */
+    public function procesar​Crear(): void {
+        $this->verificarCSRF();
+        $this->verificarPermiso('exposiciones.crear');
+        // Validar y crear registro
+    }
+    
+    /**
+     * Muestra detalles editables de exposición
+     */
+    public function mostrarDetalles(int $id): void {
+        $this->verificarPermiso('exposiciones.editar');
+        // Cargar y mostrar formulario con datos
+    }
+    
+    /**
+     * Elimina exposición tras confirmación
+     */
+    public function eliminar(int $id): void {
+        $this->verificarPermiso('exposiciones.eliminar');
+        $this->verificarCSRF();
+        // Eliminar con confirmación
+    }
+}
+```
+
+## MODELOS DE DATOS PRINCIPALES
+
+### Entidades Mínimas Requeridas
+1. **Usuario**: Gestión de usuarios del sistema
+2. **Rol**: Sistema de roles y permisos
+3. **Exposicion**: Gestión de exposiciones
+4. **Articulo**: Sistema de blog
+5. **Configuracion**: Ajustes del sistema
+
+### Ejemplo de Modelo Base
+```php
+abstract class ModeloBase {
+    protected BaseDatos $bd;
+    protected string $tabla;
+    
+    /**
+     * Constructor base con conexión BD
+     */
+    public function __construct(BaseDatos $baseDatos) {
+        $this->bd = $baseDatos;
+    }
+    
+    /**
+     * Obtener todos los registros con paginación
+     */
+    public function obtenerTodos(int $limite = 10, int $offset = 0): array
+    
+    /**
+     * Obtener registro por ID
+     */
+    public function obtenerPorId(int $id): ?static
+    
+    /**
+     * Crear nuevo registro
+     */
+    public function crear(array $datos): bool
+    
+    /**
+     * Actualizar registro existente
+     */
+    public function actualizar(int $id, array $datos): bool
+    
+    /**
+     * Eliminar registro
+     */
+    public function eliminar(int $id): bool
+}
+```
+
+## SISTEMA DE ENRUTADO
+Implementar sistema de rutas amigables:
+- `/` → Página inicio
+- `/blog` → Lista artículos
+- `/blog/{id}` → Artículo específico
+- `/exposiciones` → Lista exposiciones
+- `/admin` → Panel administración
+- `/admin/{entidad}` → Gestión de entidad
+- `/admin/{entidad}/{id}` → Detalles de registro
+
+## SEGURIDAD OBLIGATORIA
+- Validación y sanitización de TODAS las entradas
+- Protección contra inyección SQL (usar PDO prepared statements)
+- Protección CSRF en formularios
+- Hash seguro de contraseñas (password_hash/password_verify)
+- Validación de permisos en CADA acción administrativa
+- Escape de salida HTML para prevenir XSS
+
+## INTERFEZ DE USUARIO
+- **Frontend**: HTML5 + CSS3 + JavaScript vanilla
+- **Responsive**: Diseño adaptable (mobile-first)
+- **Framework CSS**: Bootstrap 5 o similar
+- **UX Admin**: Interfaz clara e intuitiva para gestión
+- **UX Pública**: Diseño atractivo y profesional
+
+## VALIDACIONES Y MENSAJES
+- Validaciones front-end y back-end
+- Mensajes de error claros en español
+- Mensajes de confirmación para acciones
+- Feedback visual inmediato para formularios
+
+## DOCUMENTACIÓN REQUERIDA
+- Comentarios PHPDoc en todas las clases y métodos
+- README.md con instrucciones de instalación
+- Script SQL para estructura inicial de BD
+- Documentación de API si se implementa
+
+## CRITERIOS DE FINALIZACIÓN
+El proyecto se considera completo cuando:
+1. ✅ Área pública completamente funcional
+2. ✅ Sistema de autenticación operativo
+3. ✅ Panel admin con CRUD para todas las entidades
+4. ✅ Sistema de permisos implementado
+5. ✅ Todas las funciones comentadas y documentadas
+6. ✅ Validaciones de seguridad activas
+7. ✅ Diseño responsive y usable
+
+---
+
+**RECORDATORIO CRÍTICO**: Este sistema debe ser completamente funcional, seguro y estar exhaustivamente comentado en español de España. Cada función debe tener su propósito claramente explicado.
