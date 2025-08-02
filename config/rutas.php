@@ -25,9 +25,11 @@ class Rutas {
         '/inicio' => ['controlador' => 'InicioControlador', 'metodo' => 'mostrarInicio'],
         '/acerca-de' => ['controlador' => 'InicioControlador', 'metodo' => 'mostrarAcercaDe'],
         '/blog' => ['controlador' => 'BlogControlador', 'metodo' => 'listarArticulos'],
-        '/blog/{id}' => ['controlador' => 'BlogControlador', 'metodo' => 'mostrarArticulo'],
+        '/blog/{slug}' => ['controlador' => 'BlogControlador', 'metodo' => 'mostrarArticulo'],
+        '/blog/categoria/{categoria}' => ['controlador' => 'BlogControlador', 'metodo' => 'mostrarPorCategoria'],
+        '/blog/buscar' => ['controlador' => 'BlogControlador', 'metodo' => 'buscar'],
         '/exposiciones' => ['controlador' => 'ExposicionControlador', 'metodo' => 'listarPublicas'],
-        '/exposicion/{id}' => ['controlador' => 'ExposicionControlador', 'metodo' => 'mostrarPublica'],
+        '/exposicion/{slug}' => ['controlador' => 'ExposicionControlador', 'metodo' => 'mostrarDetalles'],
         '/contacto' => ['controlador' => 'ContactoControlador', 'metodo' => 'mostrarFormulario'],
         '/contacto/enviar' => ['controlador' => 'ContactoControlador', 'metodo' => 'procesarFormulario'],
         '/login' => ['controlador' => 'AutenticacionControlador', 'metodo' => 'mostrarLogin'],
@@ -42,8 +44,8 @@ class Rutas {
      * @var array
      */
     private static array $rutasAdmin = [
-        '/admin' => ['controlador' => 'AdminDashboardControlador', 'metodo' => 'mostrarDashboard'],
-        '/admin/dashboard' => ['controlador' => 'AdminDashboardControlador', 'metodo' => 'mostrarDashboard'],
+        '/admin' => ['controlador' => 'AdminControlador', 'metodo' => 'mostrarDashboard'],
+        '/admin/dashboard' => ['controlador' => 'AdminControlador', 'metodo' => 'mostrarDashboard'],
         
         // Gestión de usuarios
         '/admin/usuarios' => ['controlador' => 'AdminUsuarioControlador', 'metodo' => 'listar'],
@@ -66,7 +68,8 @@ class Rutas {
         '/admin/exposiciones/crear' => ['controlador' => 'AdminExposicionControlador', 'metodo' => 'mostrarCrear'],
         '/admin/exposiciones/crear/procesar' => ['controlador' => 'AdminExposicionControlador', 'metodo' => 'procesarCrear'],
         '/admin/exposiciones/{id}' => ['controlador' => 'AdminExposicionControlador', 'metodo' => 'mostrarDetalles'],
-        '/admin/exposiciones/{id}/editar' => ['controlador' => 'AdminExposicionControlador', 'metodo' => 'procesarEditar'],
+        '/admin/exposiciones/{id}/editar' => ['controlador' => 'AdminExposicionControlador', 'metodo' => 'mostrarEditar'],
+        '/admin/exposiciones/{id}/editar/procesar' => ['controlador' => 'AdminExposicionControlador', 'metodo' => 'procesarEditar'],
         '/admin/exposiciones/{id}/eliminar' => ['controlador' => 'AdminExposicionControlador', 'metodo' => 'eliminar'],
         
         // Gestión de artículos
@@ -74,8 +77,10 @@ class Rutas {
         '/admin/articulos/crear' => ['controlador' => 'AdminArticuloControlador', 'metodo' => 'mostrarCrear'],
         '/admin/articulos/crear/procesar' => ['controlador' => 'AdminArticuloControlador', 'metodo' => 'procesarCrear'],
         '/admin/articulos/{id}' => ['controlador' => 'AdminArticuloControlador', 'metodo' => 'mostrarDetalles'],
-        '/admin/articulos/{id}/editar' => ['controlador' => 'AdminArticuloControlador', 'metodo' => 'procesarEditar'],
+        '/admin/articulos/{id}/editar' => ['controlador' => 'AdminArticuloControlador', 'metodo' => 'mostrarEditar'],
+        '/admin/articulos/{id}/editar/procesar' => ['controlador' => 'AdminArticuloControlador', 'metodo' => 'procesarEditar'],
         '/admin/articulos/{id}/eliminar' => ['controlador' => 'AdminArticuloControlador', 'metodo' => 'eliminar'],
+        '/admin/articulos/{id}/preview' => ['controlador' => 'AdminArticuloControlador', 'metodo' => 'previsualizarArticulo'],
         
         // Configuración del sistema
         '/admin/configuracion' => ['controlador' => 'AdminConfiguracionControlador', 'metodo' => 'mostrar'],
@@ -87,7 +92,20 @@ class Rutas {
      * @return string Ruta limpia
      */
     public static function obtenerRutaActual(): string {
+        // Si se está usando el parámetro 'ruta' (modo fallback)
+        if (isset($_GET['ruta']) && !empty($_GET['ruta'])) {
+            $ruta = '/' . trim($_GET['ruta'], '/');
+            return $ruta === '/' ? '/' : $ruta;
+        }
+        
+        // Obtener ruta desde REQUEST_URI (rutas limpias)
         $ruta = $_SERVER['REQUEST_URI'] ?? '/';
+        
+        // Remover el directorio base si existe
+        $directorioBase = dirname($_SERVER['SCRIPT_NAME']);
+        if ($directorioBase !== '/' && str_starts_with($ruta, $directorioBase)) {
+            $ruta = substr($ruta, strlen($directorioBase));
+        }
         
         // Remover parámetros GET
         $posicionInterrogacion = strpos($ruta, '?');

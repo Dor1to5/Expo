@@ -12,21 +12,66 @@
 // Incluir configuración principal
 require_once __DIR__ . '/../config/configuracion.php';
 require_once __DIR__ . '/../config/basedatos.php';
+require_once __DIR__ . '/../config/rutas.php';
 
-use Config\Rutas;
+// Incluir clases base necesarias
+require_once __DIR__ . '/../src/Utilidades/BaseDatos.php';
+require_once __DIR__ . '/../src/Controladores/ControladorBase.php';
+require_once __DIR__ . '/../src/Servicios/ServicioAutenticacion.php';
+require_once __DIR__ . '/../src/Modelos/ModeloBase.php';
+
+// Autoloader simple para las clases del sistema
+spl_autoload_register(function ($clase) {
+    // Reemplazar backslashes por slashes y convertir namespace a ruta
+    $archivo = str_replace('\\', DIRECTORY_SEPARATOR, $clase);
+    
+    // Rutas posibles donde buscar las clases
+    $rutasPosibles = [
+        __DIR__ . '/../src/' . $archivo . '.php',
+        __DIR__ . '/../' . $archivo . '.php'
+    ];
+    
+    foreach ($rutasPosibles as $ruta) {
+        if (file_exists($ruta)) {
+            require_once $ruta;
+            return;
+        }
+    }
+});
 
 try {
+    // Iniciar sesión si no existe
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+    
     // Obtener ruta actual
-    $rutaActual = Rutas::obtenerRutaActual();
+    $rutaActual = Config\Rutas::obtenerRutaActual();
+    
+    // Debug: mostrar información de la ruta si hay errores
+    if (isset($_GET['debug'])) {
+        echo "<pre>";
+        echo "REQUEST_URI: " . ($_SERVER['REQUEST_URI'] ?? 'No definido') . "\n";
+        echo "Parámetro ruta: " . ($_GET['ruta'] ?? 'No definido') . "\n";
+        echo "Ruta actual obtenida: $rutaActual\n";
+        echo "</pre>";
+    }
     
     // Resolver la ruta
-    $resolucion = Rutas::resolverRuta($rutaActual);
+    $resolucion = Config\Rutas::resolverRuta($rutaActual);
     
     if (!$resolucion) {
-        // Página no encontrada
-        http_response_code(404);
-        include __DIR__ . '/../vistas/publicas/404.php';
-        exit;
+        // Página no encontrada - intentar ruta por defecto
+        if ($rutaActual !== '/') {
+            $resolucion = Config\Rutas::resolverRuta('/');
+        }
+        
+        if (!$resolucion) {
+            // Si aún no hay resolución, mostrar error 404
+            http_response_code(404);
+            require_once __DIR__ . '/../vistas/publicas/404.php';
+            exit;
+        }
     }
     
     // Extraer información de la ruta

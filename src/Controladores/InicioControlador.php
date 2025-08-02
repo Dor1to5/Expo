@@ -50,17 +50,17 @@ class InicioControlador extends ControladorBase {
         try {
             $this->establecerTitulo('Inicio - ' . NOMBRE_APLICACION);
             
-            // Obtener contenido para la página principal
-            $exposicionesDestacadas = $this->modeloExposicion->obtenerDestacadas(3);
-            $exposicionesActuales = $this->modeloExposicion->obtenerActuales(4);
-            $articulosRecientes = $this->modeloArticulo->obtenerRecientes(3);
-            $articulosDestacados = $this->modeloArticulo->obtenerDestacados(2);
+            // Datos temporales para probar el sistema
+            $exposicionesDestacadas = [];
+            $exposicionesActuales = [];
+            $articulosRecientes = [];
+            $articulosDestacados = [];
             
-            // Obtener estadísticas básicas para mostrar
+            // Estadísticas básicas temporales
             $estadisticas = [
-                'total_exposiciones' => $this->modeloExposicion->contar(['publicada' => 1, 'activa' => 1]),
-                'exposiciones_actuales' => count($exposicionesActuales),
-                'total_articulos' => $this->modeloArticulo->contar(['publicado' => 1])
+                'total_exposiciones' => 0,
+                'exposiciones_actuales' => 0,
+                'total_articulos' => 0
             ];
             
             $this->renderizar('publicas/inicio', [

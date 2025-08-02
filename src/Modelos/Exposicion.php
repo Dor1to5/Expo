@@ -30,22 +30,37 @@ class Exposicion extends ModeloBase {
      */
     protected array $camposLlenables = [
         'titulo',
+        'slug',
         'descripcion',
         'descripcion_corta',
+        'categoria',
+        'ubicacion',
+        'direccion_completa',
+        'coordenadas_lat',
+        'coordenadas_lng',
         'fecha_inicio',
         'fecha_fin',
-        'ubicacion',
+        'horarios',
         'precio_entrada',
+        'precios_especiales',
+        'capacidad_maxima',
         'imagen_principal',
         'galeria_imagenes',
-        'activa',
-        'publicada',
+        'video_promocional',
+        'enlace_compra',
+        'contacto_organizador',
+        'patrocinadores',
+        'hashtags',
         'destacada',
-        'categoria',
-        'etiquetas',
+        'activa',
+        'visible',
+        'contador_visitas',
+        'puntuacion_promedio',
+        'total_valoraciones',
+        'metadatos_seo',
         'usuario_creador_id',
         'fecha_creacion',
-        'fecha_actualizacion'
+        'fecha_modificacion'
     ];
     
     /**
@@ -100,10 +115,10 @@ class Exposicion extends ModeloBase {
      * @return array Lista de exposiciones públicas
      */
     public function obtenerPublicas(int $limite = 0, int $offset = 0, array $filtros = []): array {
-        $sql = "SELECT e.*, u.nombre_completo as nombre_creador
+        $sql = "SELECT e.*, CONCAT(u.nombre, ' ', u.apellidos) as nombre_creador
                 FROM {$this->tabla} e
                 LEFT JOIN usuarios u ON e.usuario_creador_id = u.id
-                WHERE e.publicada = 1 AND e.activa = 1";
+                WHERE e.visible = 1 AND e.activa = 1";
         
         $parametros = [];
         
@@ -116,15 +131,16 @@ class Exposicion extends ModeloBase {
         // Filtrar por fechas (exposiciones actuales)
         if (!empty($filtros['actuales'])) {
             $fechaHoy = date('Y-m-d');
-            $sql .= " AND e.fecha_inicio <= :fecha_hoy AND e.fecha_fin >= :fecha_hoy";
-            $parametros['fecha_hoy'] = $fechaHoy;
+            $sql .= " AND e.fecha_inicio <= :fecha_hoy_inicio AND e.fecha_fin >= :fecha_hoy_fin";
+            $parametros['fecha_hoy_inicio'] = $fechaHoy;
+            $parametros['fecha_hoy_fin'] = $fechaHoy;
         }
         
         // Filtrar por exposiciones futuras
         if (!empty($filtros['futuras'])) {
             $fechaHoy = date('Y-m-d');
-            $sql .= " AND e.fecha_inicio > :fecha_hoy";
-            $parametros['fecha_hoy'] = $fechaHoy;
+            $sql .= " AND e.fecha_inicio > :fecha_hoy_futuras";
+            $parametros['fecha_hoy_futuras'] = $fechaHoy;
         }
         
         // Filtrar solo destacadas
@@ -158,10 +174,10 @@ class Exposicion extends ModeloBase {
      * @return array|null Datos de la exposición o null si no existe/no es pública
      */
     public function obtenerPublicaPorId(int $id): ?array {
-        $sql = "SELECT e.*, u.nombre_completo as nombre_creador
+        $sql = "SELECT e.*, CONCAT(u.nombre, ' ', u.apellidos) as nombre_creador
                 FROM {$this->tabla} e
                 LEFT JOIN usuarios u ON e.usuario_creador_id = u.id
-                WHERE e.id = :id AND e.publicada = 1 AND e.activa = 1
+                WHERE e.id = :id AND e.visible = 1 AND e.activa = 1
                 LIMIT 1";
         
         return $this->bd->seleccionarUno($sql, ['id' => $id]);
@@ -175,7 +191,7 @@ class Exposicion extends ModeloBase {
      * @return array Lista de exposiciones con datos del creador
      */
     public function obtenerParaAdmin(int $limite = 0, int $offset = 0, array $filtros = []): array {
-        $sql = "SELECT e.*, u.nombre_completo as nombre_creador
+        $sql = "SELECT e.*, CONCAT(u.nombre, ' ', u.apellidos) as nombre_creador
                 FROM {$this->tabla} e
                 LEFT JOIN usuarios u ON e.usuario_creador_id = u.id";
         
@@ -475,5 +491,121 @@ class Exposicion extends ModeloBase {
         }
         
         return parent::actualizar($id, $datos);
+    }
+    
+    /**
+     * Cuenta el total de exposiciones con filtros opcionales
+     * @param array $filtros Filtros de búsqueda
+     * @return int Total de exposiciones
+     */
+    public function contarTodos(array $filtros = []): int {
+        $sql = "SELECT COUNT(*) as total FROM {$this->tabla} WHERE 1=1";
+        $parametros = [];
+        
+        // Aplicar filtros
+        if (!empty($filtros['activa'])) {
+            $sql .= " AND activa = :activa";
+            $parametros['activa'] = $filtros['activa'];
+        }
+        
+        if (!empty($filtros['visible'])) {
+            $sql .= " AND visible = :visible";
+            $parametros['visible'] = $filtros['visible'];
+        }
+        
+        if (!empty($filtros['categoria'])) {
+            $sql .= " AND categoria = :categoria";
+            $parametros['categoria'] = $filtros['categoria'];
+        }
+        
+        if (!empty($filtros['usuario_id'])) {
+            $sql .= " AND usuario_creador_id = :usuario_id";
+            $parametros['usuario_id'] = $filtros['usuario_id'];
+        }
+        
+        if (!empty($filtros['busqueda'])) {
+            $sql .= " AND (titulo LIKE :busqueda OR descripcion LIKE :busqueda)";
+            $parametros['busqueda'] = '%' . $filtros['busqueda'] . '%';
+        }
+        
+        $resultado = $this->bd->seleccionarUno($sql, $parametros);
+        return (int) ($resultado['total'] ?? 0);
+    }
+
+    /**
+     * Valida si un slug ya existe en la base de datos
+     * @param string $slug El slug a validar
+     * @param int|null $excluirId ID a excluir de la validación (para ediciones)
+     * @return bool True si el slug existe, false si no
+     */
+    public function slugExiste(string $slug, ?int $excluirId = null): bool {
+        $sql = "SELECT COUNT(*) as total FROM {$this->tabla} WHERE slug = :slug";
+        $parametros = ['slug' => $slug];
+        
+        if ($excluirId) {
+            $sql .= " AND id != :excluir_id";
+            $parametros['excluir_id'] = $excluirId;
+        }
+        
+        $resultado = $this->bd->seleccionarUno($sql, $parametros);
+        return ($resultado['total'] ?? 0) > 0;
+    }
+
+    /**
+     * Obtiene exposiciones con información del creador
+     * @param array $filtros Filtros de búsqueda
+     * @param int $limite Límite de resultados
+     * @param int $offset Offset para paginación
+     * @return array Lista de exposiciones con información del creador
+     */
+    public function obtenerConCreador(array $filtros = [], int $limite = 0, int $offset = 0): array {
+        $sql = "SELECT e.*, 
+                       CONCAT(u.nombre, ' ', u.apellidos) as nombre_creador,
+                       u.email as email_creador,
+                       u.avatar as avatar_creador
+                FROM {$this->tabla} e
+                LEFT JOIN usuarios u ON e.usuario_creador_id = u.id
+                WHERE 1=1";
+        
+        $parametros = [];
+        
+        // Aplicar filtros
+        if (!empty($filtros['activa'])) {
+            $sql .= " AND e.activa = :activa";
+            $parametros['activa'] = $filtros['activa'];
+        }
+        
+        if (!empty($filtros['visible'])) {
+            $sql .= " AND e.visible = :visible";
+            $parametros['visible'] = $filtros['visible'];
+        }
+        
+        if (!empty($filtros['categoria'])) {
+            $sql .= " AND e.categoria = :categoria";
+            $parametros['categoria'] = $filtros['categoria'];
+        }
+        
+        if (!empty($filtros['usuario_id'])) {
+            $sql .= " AND e.usuario_creador_id = :usuario_id";
+            $parametros['usuario_id'] = $filtros['usuario_id'];
+        }
+        
+        if (!empty($filtros['busqueda'])) {
+            $sql .= " AND (e.titulo LIKE :busqueda OR e.descripcion LIKE :busqueda)";
+            $parametros['busqueda'] = '%' . $filtros['busqueda'] . '%';
+        }
+        
+        // Ordenar por fecha de creación descendente
+        $sql .= " ORDER BY e.fecha_creacion DESC";
+        
+        // Agregar límite y offset
+        if ($limite > 0) {
+            $sql .= " LIMIT {$limite}";
+            if ($offset > 0) {
+                $sql .= " OFFSET {$offset}";
+            }
+        }
+        
+        return $this->bd->seleccionar($sql, $parametros);
     }
 }

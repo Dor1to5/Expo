@@ -131,9 +131,26 @@ abstract class ControladorBase {
             $tokenEnviado = $_POST['csrf_token'] ?? '';
             $tokenSesion = $_SESSION['csrf_token'] ?? '';
             
-            if (empty($tokenEnviado) || empty($tokenSesion) || !hash_equals($tokenSesion, $tokenEnviado)) {
-                throw new Exception("Token CSRF inválido");
+            error_log("CSRF DEBUG: Token enviado longitud: " . strlen($tokenEnviado));
+            error_log("CSRF DEBUG: Token sesión longitud: " . strlen($tokenSesion));
+            error_log("CSRF DEBUG: Tokens iguales: " . ($tokenEnviado === $tokenSesion ? 'SÍ' : 'NO'));
+            
+            if (empty($tokenEnviado)) {
+                error_log("CSRF DEBUG: Token enviado está vacío");
+                throw new Exception("Token CSRF enviado está vacío");
             }
+            
+            if (empty($tokenSesion)) {
+                error_log("CSRF DEBUG: Token de sesión está vacío");
+                throw new Exception("Token CSRF de sesión está vacío");
+            }
+            
+            if (!hash_equals($tokenSesion, $tokenEnviado)) {
+                error_log("CSRF DEBUG: Los tokens no coinciden");
+                throw new Exception("Token CSRF inválido - no coinciden");
+            }
+            
+            error_log("CSRF DEBUG: Verificación exitosa");
         }
     }
     
@@ -142,6 +159,7 @@ abstract class ControladorBase {
      * @return string Token CSRF generado
      */
     protected function generarTokenCSRF(): string {
+        // Solo generar nuevo token si no existe uno en la sesión
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
@@ -167,6 +185,14 @@ abstract class ControladorBase {
     }
     
     /**
+     * Verifica si el usuario está autenticado (alias)
+     * @throws Exception Si no está autenticado
+     */
+    protected function verificarAutenticacion(): void {
+        $this->requerirAutenticacion();
+    }
+    
+    /**
      * Verifica si el usuario es administrador
      * @throws Exception Si no es administrador
      */
@@ -188,7 +214,7 @@ abstract class ControladorBase {
             // Sanitizar valor
             if (is_string($valor)) {
                 $valor = trim($valor);
-                $valor = filter_var($valor, FILTER_SANITIZE_STRING);
+                $valor = htmlspecialchars($valor, ENT_QUOTES, 'UTF-8');
             }
             
             $datos[$campo] = $valor;
@@ -392,5 +418,30 @@ abstract class ControladorBase {
      */
     protected function establecerLayout(string $layout): void {
         $this->layout = $layout;
+    }
+    
+    /**
+     * Muestra página de error 404
+     * @param string $mensaje Mensaje personalizado (opcional)
+     */
+    protected function mostrarError404(string $mensaje = 'Página no encontrada'): void {
+        // Establecer código de respuesta HTTP 404
+        http_response_code(404);
+        
+        // Si es una petición AJAX, devolver JSON
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            $this->renderizarJson([
+                'exito' => false,
+                'mensaje' => $mensaje,
+                'codigo_error' => 404
+            ], 404);
+            return;
+        }
+        
+        // Renderizar página de error 404
+        $this->renderizar('publicas/404', [
+            'titulo_pagina' => 'Página no encontrada',
+            'mensaje_error' => $mensaje
+        ], 'publico');
     }
 }

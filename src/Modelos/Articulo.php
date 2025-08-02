@@ -31,18 +31,30 @@ class Articulo extends ModeloBase {
     protected array $camposLlenables = [
         'titulo',
         'slug',
-        'contenido',
         'resumen',
-        'imagen_destacada',
-        'publicado',
-        'destacado',
+        'contenido',
+        'contenido_texto',
         'categoria',
-        'etiquetas',
+        'tags',
+        'imagen_destacada',
+        'galeria_imagenes',
+        'autor_id',
+        'autor_invitado',
+        'estado',
+        'destacado',
+        'permitir_comentarios',
         'fecha_publicacion',
-        'usuario_autor_id',
-        'visitas',
+        'fecha_caducidad',
+        'contador_visitas',
+        'tiempo_lectura',
+        'puntuacion_promedio',
+        'total_valoraciones',
+        'total_comentarios',
+        'total_compartidos',
+        'metadatos_seo',
+        'configuracion',
         'fecha_creacion',
-        'fecha_actualizacion'
+        'fecha_modificacion'
     ];
     
     /**
@@ -54,7 +66,19 @@ class Articulo extends ModeloBase {
         'slug' => ['requerido', 'min:5', 'max:255', 'unico'],
         'contenido' => ['requerido', 'min:50'],
         'resumen' => ['max:500'],
-        'usuario_autor_id' => ['requerido']
+        'autor_id' => ['requerido']
+    ];
+    
+    /**
+     * Estados posibles de un artículo
+     * @var array
+     */
+    private static array $estados = [
+        'borrador' => 'Borrador',
+        'revision' => 'En Revisión',
+        'programado' => 'Programado',
+        'publicado' => 'Publicado',
+        'archivado' => 'Archivado'
     ];
     
     /**
@@ -523,5 +547,39 @@ class Articulo extends ModeloBase {
         $datos['fecha_actualizacion'] = date('Y-m-d H:i:s');
         
         return parent::actualizar($id, $datos);
+    }
+    
+    /**
+     * Cuenta el total de artículos con filtros opcionales
+     * @param array $filtros Filtros de búsqueda
+     * @return int Total de artículos
+     */
+    public function contarTodos(array $filtros = []): int {
+        $sql = "SELECT COUNT(*) as total FROM {$this->tabla} WHERE 1=1";
+        $parametros = [];
+        
+        // Aplicar filtros
+        if (!empty($filtros['publicado'])) {
+            $sql .= " AND publicado = :publicado";
+            $parametros['publicado'] = $filtros['publicado'];
+        }
+        
+        if (!empty($filtros['categoria'])) {
+            $sql .= " AND categoria = :categoria";
+            $parametros['categoria'] = $filtros['categoria'];
+        }
+        
+        if (!empty($filtros['usuario_id'])) {
+            $sql .= " AND autor_id = :usuario_id";
+            $parametros['usuario_id'] = $filtros['usuario_id'];
+        }
+        
+        if (!empty($filtros['busqueda'])) {
+            $sql .= " AND (titulo LIKE :busqueda OR contenido LIKE :busqueda OR resumen LIKE :busqueda)";
+            $parametros['busqueda'] = '%' . $filtros['busqueda'] . '%';
+        }
+        
+        $resultado = $this->bd->seleccionarUno($sql, $parametros);
+        return (int) ($resultado['total'] ?? 0);
     }
 }

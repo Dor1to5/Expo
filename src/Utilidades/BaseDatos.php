@@ -60,10 +60,10 @@ class BaseDatos {
         if (self::$instancia === null) {
             try {
                 self::$instancia = new PDO(
-                    BD_DSN,
-                    BD_USUARIO,
-                    BD_CONTRASENA,
-                    BD_OPCIONES
+                    \BD_DSN,
+                    \BD_USUARIO,
+                    \BD_CONTRASENA,
+                    \BD_OPCIONES
                 );
                 
                 // Configurar el modo de error para que lance excepciones
