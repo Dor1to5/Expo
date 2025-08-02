@@ -66,37 +66,37 @@
                     
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="/admin/dashboard">
+                            <a class="nav-link" href="index.php?ruta=admin">
                                 <i class="fas fa-tachometer-alt me-2"></i>
                                 Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/usuarios">
+                            <a class="nav-link" href="index.php?ruta=admin/usuarios">
                                 <i class="fas fa-users me-2"></i>
                                 Usuarios
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/exposiciones">
+                            <a class="nav-link" href="index.php?ruta=admin/exposiciones">
                                 <i class="fas fa-images me-2"></i>
                                 Exposiciones
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/articulos">
+                            <a class="nav-link" href="index.php?ruta=admin/articulos">
                                 <i class="fas fa-newspaper me-2"></i>
                                 Artículos
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/roles">
+                            <a class="nav-link" href="index.php?ruta=admin/roles">
                                 <i class="fas fa-user-shield me-2"></i>
                                 Roles
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/configuracion">
+                            <a class="nav-link" href="index.php?ruta=admin/configuracion">
                                 <i class="fas fa-cogs me-2"></i>
                                 Configuración
                             </a>
@@ -105,13 +105,13 @@
                         <hr class="my-3" style="border-color: rgba(255,255,255,0.2);">
                         
                         <li class="nav-item">
-                            <a class="nav-link" href="/" target="_blank">
+                            <a class="nav-link" href="index.php" target="_blank">
                                 <i class="fas fa-external-link-alt me-2"></i>
                                 Ver Sitio Público
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/logout">
+                            <a class="nav-link" href="index.php?ruta=logout">
                                 <i class="fas fa-sign-out-alt me-2"></i>
                                 Cerrar Sesión
                             </a>
@@ -136,8 +136,8 @@
                                     <?= $_SESSION['usuario_nombre'] ?? 'Administrador' ?>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="/admin/perfil"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
-                                    <li><a class="dropdown-item" href="/admin/configuracion"><i class="fas fa-cogs me-2"></i>Configuración</a></li>
+                                    <li><a class="dropdown-item" href="index.php?ruta=admin/perfil"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
+                                    <li><a class="dropdown-item" href="index.php?ruta=admin/configuracion"><i class="fas fa-cogs me-2"></i>Configuración</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
                                 </ul>
@@ -183,6 +183,28 @@
                 bsAlert.close();
             });
         }, 5000);
+
+        // Manejar estado activo del menú
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUrl = window.location.search;
+            const menuLinks = document.querySelectorAll('.sidebar .nav-link');
+            
+            menuLinks.forEach(function(link) {
+                // Remover clase active de todos los enlaces
+                link.classList.remove('active');
+                
+                // Obtener la ruta del enlace
+                const linkUrl = new URL(link.href);
+                const linkRoute = linkUrl.searchParams.get('ruta');
+                const currentRoute = new URLSearchParams(currentUrl).get('ruta');
+                
+                // Marcar como activo si coincide la ruta
+                if (linkRoute === currentRoute || (currentRoute === null && linkRoute === null)) {
+                    link.classList.add('active');
+                }
+            });
+        });
     </script>
 </body>
 </html>
+

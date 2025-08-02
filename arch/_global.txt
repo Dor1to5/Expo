@@ -605,4 +605,101 @@ El proyecto se considera completo cuando:
 
 ---
 
+## FUNCIONALIDADES DESACTIVADAS TEMPORALMENTE
+
+> **NOTA IMPORTANTE**: Las siguientes funcionalidades han sido **temporalmente desactivadas** para permitir el desarrollo y testing del sistema. Estas funcionalidades deben ser **reactivadas** antes del despliegue en producción.
+
+### 🔐 Sistema de Autenticación
+**Estado**: ❌ **DESACTIVADO**
+**Ubicación**: Controladores `AdminExposicionControlador.php` y `AdminArticuloControlador.php`
+**Métodos Comentados**:
+```php
+// DESACTIVADO TEMPORALMENTE - AdminExposicionControlador.php
+// $this->verificarAutenticacion();          // Línea ~30 en listar()
+// $this->verificarPermiso('exposiciones.listar');   // Línea ~31 en listar()
+// $this->verificarPermiso('exposiciones.crear');    // Línea ~67 en mostrarCrear()
+
+// DESACTIVADO TEMPORALMENTE - AdminArticuloControlador.php  
+// $this->verificarAutenticacion();          // Línea ~30 en listar()
+// $this->verificarPermiso('articulos.listar');      // Línea ~34 en listar()
+// $this->verificarPermiso('articulos.crear');       // Línea ~67 en mostrarCrear()
+// $this->verificarPermiso('articulos.crear');       // Línea ~94 en procesarCrear()
+```
+
+**Razón de Desactivación**: Bloquea el acceso a los formularios de creación y listados durante el desarrollo
+**Impacto**: Sistema sin control de acceso ni validación de permisos
+**Reactivación Requerida**: ✅ Antes del despliegue en producción
+
+### 🛡️ Validación de Tokens CSRF
+**Estado**: ❌ **DESACTIVADO**
+**Ubicación**: Múltiples controladores administrativos
+**Comentario en Código**:
+```php
+// CSRF removido temporalmente para desarrollo
+// $this->verificarTokenCSRF();
+```
+
+**Razón de Desactivación**: Facilitar testing de formularios sin generar tokens
+**Impacto**: Vulnerabilidad a ataques Cross-Site Request Forgery
+**Reactivación Requerida**: ✅ Crítica antes de producción
+
+### 👤 Gestión Completa de Sesiones
+**Estado**: ⚠️ **PARCIALMENTE FUNCIONAL**
+**Ubicación**: `ServicioAutenticacion.php`
+**Funcionalidades Afectadas**:
+- Timeout de sesiones automático
+- Regeneración de ID de sesión
+- Validación de IP de sesión
+- Logging de intentos de acceso
+
+**Razón**: Simplificar el flujo de desarrollo y testing
+**Impacto**: Sesiones menos seguras y sin auditoría completa
+
+### 🔍 Sistema de Logging y Auditoría
+**Estado**: ❌ **NO IMPLEMENTADO**
+**Funcionalidades Faltantes**:
+- Log de acciones administrativas
+- Registro de intentos de login fallidos
+- Auditoría de cambios en datos críticos
+- Alertas de seguridad
+
+**Impacto**: Sin trazabilidad de acciones del sistema
+
+### 📧 Validaciones de Email y Notificaciones
+**Estado**: ⚠️ **BÁSICO**
+**Funcionalidades Limitadas**:
+- Confirmación de registro por email
+- Recuperación de contraseñas
+- Notificaciones administrativas
+- Alertas de seguridad
+
+### 🌐 Limitaciones de Rate Limiting
+**Estado**: ❌ **NO IMPLEMENTADO**
+**Funcionalidades Faltantes**:
+- Límites de intentos de login
+- Protección contra spam en formularios
+- Throttling de API requests
+
+## ⚠️ LISTA DE REACTIVACIÓN OBLIGATORIA
+
+**Antes del despliegue en producción, REACTIVAR:**
+
+1. ✅ **Autenticación completa**
+   ```php
+   $this->verificarAutenticacion();
+   $this->verificarPermiso('recurso.accion');
+   ```
+
+2. ✅ **Tokens CSRF en todos los formularios**
+   ```php
+   $this->verificarTokenCSRF();
+   ```
+
+3. ✅ **Validaciones de sesión completas**
+4. ✅ **Sistema de logging y auditoría**
+5. ✅ **Rate limiting y protección anti-spam**
+6. ✅ **Validaciones de email y notificaciones**
+
+---
+
 **RECORDATORIO CRÍTICO**: Este sistema debe ser completamente funcional, seguro y estar exhaustivamente comentado en español de España. Cada función debe tener su propósito claramente explicado.

@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0 text-gray-800">Crear Nuevo Usuario</h1>
-    <a href="/admin/usuarios" class="btn btn-secondary">
+    <a href="index.php?ruta=admin/usuarios" class="btn btn-secondary">
         <i class="fas fa-arrow-left me-2"></i>Volver a Lista
     </a>
 </div>
@@ -124,7 +124,7 @@
                     <hr>
                     
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="/admin/usuarios" class="btn btn-secondary me-md-2">Cancelar</a>
+                        <a href="index.php?ruta=admin/usuarios" class="btn btn-secondary me-md-2">Cancelar</a>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save me-2"></i>Crear Usuario
                         </button>
@@ -210,3 +210,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+

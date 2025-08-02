@@ -22,7 +22,7 @@
                     <?php endif; ?>
                     
                     <div class="d-flex flex-column flex-md-row gap-2 justify-content-center">
-                        <a href="/admin/dashboard" class="btn btn-primary">
+                        <a href="index.php?ruta=admin/dashboard" class="btn btn-primary">
                             <i class="fas fa-tachometer-alt me-2"></i>Ir al Dashboard
                         </a>
                         <button onclick="history.back()" class="btn btn-outline-secondary">
@@ -37,3 +37,4 @@
         </div>
     </div>
 </div>
+

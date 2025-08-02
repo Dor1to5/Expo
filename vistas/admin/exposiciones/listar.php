@@ -2,7 +2,7 @@
     <h1 class="h3 mb-0 text-gray-800">
         <i class="fas fa-building me-2"></i>Gestión de Exposiciones
     </h1>
-    <a href="/admin/exposiciones/crear" class="btn btn-primary">
+    <a href="index.php?ruta=admin/exposiciones/crear" class="btn btn-primary">
         <i class="fas fa-plus me-2"></i>Nueva Exposición
     </a>
 </div>
@@ -116,7 +116,7 @@
                 <i class="fas fa-building fa-3x text-gray-300 mb-3"></i>
                 <h5 class="text-gray-600">No hay exposiciones registradas</h5>
                 <p class="text-gray-500">Comienza creando tu primera exposición</p>
-                <a href="/admin/exposiciones/crear" class="btn btn-primary">
+                <a href="index.php?ruta=admin/exposiciones/crear" class="btn btn-primary">
                     <i class="fas fa-plus me-2"></i>Crear Primera Exposición
                 </a>
             </div>
@@ -197,11 +197,11 @@
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="/admin/exposiciones/<?= $exposicion['id'] ?>/editar" 
+                                        <a href="index.php?ruta=admin/exposiciones/<?= $exposicion['id'] ?>/editar" 
                                            class="btn btn-sm btn-outline-primary" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="/admin/exposiciones/<?= $exposicion['id'] ?>" 
+                                        <a href="index.php?ruta=admin/exposiciones/<?= $exposicion['id'] ?>" 
                                            class="btn btn-sm btn-outline-info" title="Ver">
                                             <i class="fas fa-eye"></i>
                                         </a>
@@ -224,7 +224,7 @@
                     <ul class="pagination justify-content-center">
                         <?php if ($paginaActual > 1): ?>
                             <li class="page-item">
-                                <a class="page-link" href="/admin/exposiciones?pagina=<?= $paginaActual - 1 ?>">
+                                <a class="page-link" href="index.php?ruta=admin/exposiciones?pagina=<?= $paginaActual - 1 ?>">
                                     <i class="fas fa-chevron-left"></i>
                                 </a>
                             </li>
@@ -232,13 +232,13 @@
                         
                         <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
                             <li class="page-item <?= $i === $paginaActual ? 'active' : '' ?>">
-                                <a class="page-link" href="/admin/exposiciones?pagina=<?= $i ?>"><?= $i ?></a>
+                                <a class="page-link" href="index.php?ruta=admin/exposiciones?pagina=<?= $i ?>"><?= $i ?></a>
                             </li>
                         <?php endfor; ?>
                         
                         <?php if ($paginaActual < $totalPaginas): ?>
                             <li class="page-item">
-                                <a class="page-link" href="/admin/exposiciones?pagina=<?= $paginaActual + 1 ?>">
+                                <a class="page-link" href="index.php?ruta=admin/exposiciones?pagina=<?= $paginaActual + 1 ?>">
                                     <i class="fas fa-chevron-right"></i>
                                 </a>
                             </li>
@@ -285,3 +285,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+

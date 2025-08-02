@@ -57,7 +57,7 @@
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="/perfil"><i class="fas fa-user-edit me-2"></i>Mi Perfil</a></li>
                                 <?php if ($es_admin): ?>
-                                    <li><a class="dropdown-item" href="/admin"><i class="fas fa-cogs me-2"></i>Administración</a></li>
+                                    <li><a class="dropdown-item" href="index.php?ruta=admin"><i class="fas fa-cogs me-2"></i>Administración</a></li>
                                 <?php endif; ?>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
@@ -178,3 +178,4 @@
     </script>
 </body>
 </html>
+

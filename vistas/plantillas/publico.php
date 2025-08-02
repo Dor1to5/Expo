@@ -92,7 +92,7 @@
                                 </a></li>
                                 <?php if ($es_admin): ?>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/admin">
+                                    <li><a class="dropdown-item" href="index.php?ruta=admin">
                                         <i class="fas fa-cogs me-2"></i>Panel de Administración
                                     </a></li>
                                 <?php endif; ?>
@@ -341,3 +341,4 @@
     </script>
 </body>
 </html>
+

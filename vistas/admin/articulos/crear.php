@@ -2,7 +2,7 @@
     <h1 class="h3 mb-0 text-gray-800">
         <i class="fas fa-plus me-2"></i>Nuevo Artículo
     </h1>
-    <a href="/admin/articulos" class="btn btn-secondary">
+    <a href="index.php?ruta=admin/articulos" class="btn btn-secondary">
         <i class="fas fa-arrow-left me-2"></i>Volver a Lista
     </a>
 </div>
@@ -156,7 +156,7 @@
                         <button type="button" class="btn btn-outline-info me-md-2" onclick="previsualizarArticulo()">
                             <i class="fas fa-eye me-2"></i>Vista Previa
                         </button>
-                        <a href="/admin/articulos" class="btn btn-secondary me-md-2">
+                        <a href="index.php?ruta=admin/articulos" class="btn btn-secondary me-md-2">
                             <i class="fas fa-times me-2"></i>Cancelar
                         </a>
                         <button type="submit" class="btn btn-primary">
@@ -404,3 +404,4 @@ function previsualizarArticulo() {
     new bootstrap.Modal(document.getElementById('modalVistaPrevia')).show();
 }
 </script>
+

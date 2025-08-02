@@ -2,7 +2,7 @@
     <h1 class="h3 mb-0 text-gray-800">
         <i class="fas fa-plus me-2"></i>Nueva Exposición
     </h1>
-    <a href="/admin/exposiciones" class="btn btn-secondary">
+    <a href="index.php?ruta=admin/exposiciones" class="btn btn-secondary">
         <i class="fas fa-arrow-left me-2"></i>Volver a Lista
     </a>
 </div>
@@ -188,7 +188,7 @@
                     <hr>
                     
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="/admin/exposiciones" class="btn btn-secondary me-md-2">
+                        <a href="index.php?ruta=admin/exposiciones" class="btn btn-secondary me-md-2">
                             <i class="fas fa-times me-2"></i>Cancelar
                         </a>
                         <button type="submit" class="btn btn-primary">
@@ -330,3 +330,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+

@@ -104,25 +104,25 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            <a href="/admin/usuarios" class="btn btn-primary btn-block">
+                            <a href="index.php?ruta=admin/usuarios" class="btn btn-primary btn-block">
                                 <i class="fas fa-users me-2"></i>
                                 Gestionar Usuarios
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <a href="/admin/exposiciones" class="btn btn-success btn-block">
+                            <a href="index.php?ruta=admin/exposiciones" class="btn btn-success btn-block">
                                 <i class="fas fa-images me-2"></i>
                                 Gestionar Exposiciones
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <a href="/admin/articulos" class="btn btn-info btn-block">
+                            <a href="index.php?ruta=admin/articulos" class="btn btn-info btn-block">
                                 <i class="fas fa-newspaper me-2"></i>
                                 Gestionar Artículos
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <a href="/admin/configuracion" class="btn btn-warning btn-block">
+                            <a href="index.php?ruta=admin/configuracion" class="btn btn-warning btn-block">
                                 <i class="fas fa-cogs me-2"></i>
                                 Configuración
                             </a>

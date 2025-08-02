@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0 text-gray-800">Gestión de Usuarios</h1>
-    <a href="/admin/usuarios/crear" class="btn btn-primary">
+    <a href="index.php?ruta=admin/usuarios/crear" class="btn btn-primary">
         <i class="fas fa-plus me-2"></i>Crear Usuario
     </a>
 </div>
@@ -16,7 +16,7 @@
             <div class="text-center py-4">
                 <i class="fas fa-users fa-3x text-gray-300 mb-3"></i>
                 <p class="text-muted">No hay usuarios registrados</p>
-                <a href="/admin/usuarios/crear" class="btn btn-primary">
+                <a href="index.php?ruta=admin/usuarios/crear" class="btn btn-primary">
                     <i class="fas fa-plus me-2"></i>Crear Primer Usuario
                 </a>
             </div>
@@ -71,10 +71,10 @@
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="/admin/usuarios/<?= $usuario['id'] ?>" class="btn btn-sm btn-info">
+                                        <a href="index.php?ruta=admin/usuarios/<?= $usuario['id'] ?>" class="btn btn-sm btn-info">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="/admin/usuarios/<?= $usuario['id'] ?>/editar" class="btn btn-sm btn-warning">
+                                        <a href="index.php?ruta=admin/usuarios/<?= $usuario['id'] ?>/editar" class="btn btn-sm btn-warning">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <?php if ($usuario['id'] != 1): // No eliminar admin principal ?>
@@ -125,3 +125,4 @@ function eliminarUsuario(id, nombre) {
     modal.show();
 }
 </script>
+
